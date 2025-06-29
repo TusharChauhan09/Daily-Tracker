@@ -15,7 +15,14 @@ import { AuthProvider } from "@/lib/auth-context";
 // 11. Context and Hook
 import { useAuth } from "@/lib/auth-context";
 
-import { Text } from "react-native-paper";
+// 16 PaperProvider : to use react-native-paper
+import { PaperProvider, Text } from "react-native-paper";
+
+// 15 SafeAreaProvider : to avoid the screen out bounderies and notches of different devices 
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+// 18 custome theme 
+import themes from "@/lib/themes";
 
 // 8.1 route guard function
 function RouteGuard({ children }: { children: React.ReactNode }) {
@@ -60,16 +67,19 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RouteGuard>
-        <Stack>
-          {/* 4.1 Stack.Screen  */}
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </RouteGuard>
+      <PaperProvider theme={themes}>
+        <SafeAreaProvider>
+          <RouteGuard>
+            <Stack>
+              {/* 4.1 Stack.Screen  */}
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </RouteGuard>
+        </SafeAreaProvider>
+      </PaperProvider>
     </AuthProvider>
   );
 }

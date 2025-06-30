@@ -25,7 +25,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tasks",
+          title: "Today's Tasks",
           // 6.1 Icon use
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons

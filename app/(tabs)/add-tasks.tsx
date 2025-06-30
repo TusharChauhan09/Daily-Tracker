@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, SegmentedButtons, TextInput } from "react-native-paper";
+import { Button, SegmentedButtons, TextInput, Text, useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/lib/auth-context";
@@ -16,14 +16,14 @@ type Frequency = (typeof FREQUENCIES)[number];
 export default function AddTasksScreen() {
 
   const router = useRouter();
+  const theme = useTheme();
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [frequency, setFrequency] = useState<Frequency>("daily");
-  const [ error,setError ] = useState<string | null>(null)
+  const [ error,setError ] = useState<string>("")
 
-  // @ts-ignore
-  const { user } = useAuth; 
+  const { user } = useAuth(); 
 
   const handleSubmit = async () =>{
     if(!user) return;
@@ -41,15 +41,22 @@ export default function AddTasksScreen() {
           "created_at": new Date().toISOString()
         }
       )
+      setTitle("");
+      setDescription("");
+      setFrequency("daily");
       router.back();
     }
     catch(error){
+      setTitle("");
+      setDescription("");
+      setFrequency("daily");
       if(error instanceof Error){
         setError(error.message);
-        return 
+        return;
       }
-      setError("There was an error creating the task ") 
+      setError("There was an error creating the add-task ");
     }
+    
   };
 
   return (
@@ -59,11 +66,13 @@ export default function AddTasksScreen() {
         mode="outlined"
         style={styles.input}
         onChangeText={setTitle}
+        value={title}
       />
       <TextInput
         label={"Description"}
         mode="outlined"
         style={styles.input}
+        value={description}
         onChangeText={setDescription}
       />
       <View style={styles.frequencyContainer}>
@@ -77,6 +86,7 @@ export default function AddTasksScreen() {
         />
       </View>
       <Button mode="contained" disabled={!title || !description } onPress={handleSubmit}>Add Tasks</Button>
+      {error && <Text style={{color: theme.colors.error}} >{error}</Text> }
     </View>
   );
 }

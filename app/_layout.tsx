@@ -18,11 +18,14 @@ import { useAuth } from "@/lib/auth-context";
 // 16 PaperProvider : to use react-native-paper
 import { PaperProvider, Text } from "react-native-paper";
 
-// 15 SafeAreaProvider : to avoid the screen out bounderies and notches of different devices 
+// 15 SafeAreaProvider : to avoid the screen out bounderies and notches of different devices
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-// 18 custome theme 
+// 18 custome theme
 import themes from "@/lib/themes";
+
+// 20 GestureHandlerRootView
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 // 8.1 route guard function
 function RouteGuard({ children }: { children: React.ReactNode }) {
@@ -69,17 +72,19 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <PaperProvider theme={themes}>
-        <SafeAreaProvider>
-          <RouteGuard>
-            <Stack>
-              {/* 4.1 Stack.Screen  */}
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </RouteGuard>
-        </SafeAreaProvider>
-      </PaperProvider>
-    </AuthProvider>
+    <GestureHandlerRootView style={{flex:1 }}>
+      <AuthProvider>
+        <PaperProvider theme={themes}>
+          <SafeAreaProvider>
+            <RouteGuard>
+              <Stack>
+                {/* 4.1 Stack.Screen  */}
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack>
+            </RouteGuard>
+          </SafeAreaProvider>
+        </PaperProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

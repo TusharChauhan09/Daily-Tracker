@@ -9,3 +9,9 @@ export interface TasksType extends Models.Document {
     last_completed: string;
     created_at: string;
 }
+
+export interface HabitCompletion extends Models.Document{
+    tasks_id: string,
+    user_id: string,
+    completed_at: string 
+}

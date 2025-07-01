@@ -17,10 +17,11 @@ import {
   databases,
   RealtimeResponse,
   TASKS_COLLECTION_ID,
+  TASKS_COMPLETIONS_COLLECTION_ID,
 } from "@/lib/appwrite";
-import { Query } from "react-native-appwrite";
+import { ID, Query } from "react-native-appwrite";
 
-import { TasksType } from "@/types/database.type";
+import { HabitCompletion, TasksType } from "@/types/database.type";
 
 import { useRouter } from "expo-router";
 
@@ -36,38 +37,76 @@ export default function Index() {
 
   const [tasks, setTasks] = useState<TasksType[]>();
 
+  const [completedTasks, setCompletedTasks] = useState<string[]>();
+
   // 20.1 to store all swipeable value
   const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
-  //left swipe 
+  //left swipe
   const renderLeftActions = () => (
     <View style={styles.LeftActions}>
-      <MaterialCommunityIcons name={"trash-can-outline"} size={32} color={"#fff"}   />
+      <MaterialCommunityIcons
+        name={"trash-can-outline"}
+        size={32}
+        color={"#fff"}
+      />
     </View>
   );
 
   // deleting task on left swipe
   const handleDeleteTask = async (id: string) => {
-    try{
-      await databases.deleteDocument(DATABASE_ID,TASKS_COLLECTION_ID, id);
-    }
-    catch(error){
+    try {
+      await databases.deleteDocument(DATABASE_ID, TASKS_COLLECTION_ID, id);
+    } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   // right swipe
-  const renderRightActions = () => (
+  const renderRightActions = (id: string ) => (
     <View style={styles.RightActions}>
-      <MaterialCommunityIcons name={"check-circle-outline"} size={32} color={"#fff"}   />
+      <MaterialCommunityIcons
+        name={"check-circle-outline"}
+        size={32}
+        color={"#fff"}
+      />
     </View>
   );
 
   // complete tasks on right swipe
-  const handleCompleteTask = (id: string) => {
+  const handleCompleteTask = async (id: string) => {
+    // console.log(id);
+    if (!user || completedTasks?.includes(id)) return;
+    try {
+      const date = new Date().toISOString();
+      await databases.createDocument(
+        DATABASE_ID,
+        TASKS_COMPLETIONS_COLLECTION_ID,
+        ID.unique(),
+        {
+          tasks_id: id,
+          user_id: user.$id,
+          completed_at: date,
+        }
+      );
+      const task = tasks?.find((t) => t.$id === id);
+      if (!tasks || task === undefined) return;
 
-  }
+      await databases.updateDocument(DATABASE_ID, TASKS_COLLECTION_ID, id, {
+        streak_count: task.streak_count + 1,
+        last_completed: date,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  // return t/f if the task is completed today
+  const isTasksCompleted = (id: string) => {
+    return completedTasks?.includes(id);
+  };
+
+  // all the task of the user
   const fetchTasks = async () => {
     try {
       const response = await databases.listDocuments(
@@ -75,7 +114,7 @@ export default function Index() {
         TASKS_COLLECTION_ID,
         [Query.equal("user_id", user?.$id ?? "")] //condition for fectching the current user tasks
       );
-      console.log(response.documents);
+      // console.log(response.documents);
       //@ts-ignore
       setTasks(response.documents as TasksType);
     } catch (error) {
@@ -83,11 +122,34 @@ export default function Index() {
     }
   };
 
+  // get all the completed tasks
+  const fetchTodayCompletions = async () => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_COMPLETIONS_COLLECTION_ID,
+        [
+          Query.equal("user_id", user?.$id ?? ""),
+          Query.greaterThanEqual("completed_at", today.toISOString()), //condition for fectching the current user tasks and that are completed today in completed_at field in the table
+        ]
+      );
+      // console.log(response.documents);
+      const completions = response.documents as HabitCompletion[];
+      setCompletedTasks(completions.map((c) => c.tasks_id as string));
+      // console.log(completedTasks?.toString());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
-      const habitsChannel = `databases.${DATABASE_ID}.collections.${TASKS_COLLECTION_ID}.documents`;
-      const habitsSubscription = client.subscribe(
-        habitsChannel,
+      // realtime for all the tasks
+      const tasksChannel = `databases.${DATABASE_ID}.collections.${TASKS_COLLECTION_ID}.documents`;
+      const tasksSubscription = client.subscribe(
+        tasksChannel,
         (response: RealtimeResponse) => {
           if (
             response.events.includes(
@@ -110,11 +172,26 @@ export default function Index() {
           }
         }
       );
+      //realtime for todays tasks
+      const completionsChannel = `databases.${DATABASE_ID}.collections.${TASKS_COMPLETIONS_COLLECTION_ID}.documents`;
+      const completionsSubscription = client.subscribe(
+        completionsChannel,
+        (response: RealtimeResponse) => {
+          if (
+            response.events.includes(
+              "databases.*.collections.*.documents.*.create"
+            )
+          ) {
+            fetchTodayCompletions();
+          }
+        }
+      );
 
       fetchTasks();
-
+      fetchTodayCompletions();
       return () => {
-        habitsSubscription();
+        tasksSubscription();
+        completionsSubscription();
       };
     }
   }, [user]);
@@ -178,16 +255,16 @@ export default function Index() {
               overshootRight={false}
               // render the view on swipes
               renderLeftActions={renderLeftActions}
-              renderRightActions={renderRightActions}
-              // which function to call on left right swipe 
-              onSwipeableOpen={(direction)=>{
-                if(direction==="left") handleDeleteTask(task.$id);
-                else handleCompleteTask(task.$id);
-                // bring back / close the swipe in order to not to delete next element 
+              renderRightActions={()=>renderRightActions(task.$id)}
+              // which function to call on left right swipe
+              onSwipeableOpen={(direction) => {
+                if (direction === "left") handleDeleteTask(task.$id);
+                else if (direction === "right") handleCompleteTask(task.$id);
+                // bring back / close the swipe in order to not to delete next element
                 swipeableRefs.current[task.$id]?.close();
               }}
             >
-              <Surface style={styles.card} elevation={0}>
+              <Surface style={[styles.card, isTasksCompleted(task.$id) && styles.cardCompleted]} elevation={0}>
                 <View style={styles.cardContent}>
                   <Text style={styles.cardTitle}>{task.title}</Text>
                   <Text style={styles.cardDescription}>{task.description}</Text>
@@ -252,6 +329,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  cardCompleted:{
+    opacity: 0.6
+  },
   cardContent: {
     padding: 20,
   },
@@ -296,24 +376,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
-  LeftActions:{
-    justifyContent:"center",
-    alignItems:"flex-start",
-    flex:1,
+  LeftActions: {
+    justifyContent: "center",
+    alignItems: "flex-start",
+    flex: 1,
     backgroundColor: "#e53935",
-    borderRadius:18,
-    marginBottom:18,
-    marginTop:2,
-    paddingLeft: 16
+    borderRadius: 18,
+    marginBottom: 18,
+    marginTop: 2,
+    paddingLeft: 16,
   },
-  RightActions:{
-    justifyContent:"center",
-    alignItems:"flex-end",
-    flex:1,
+  RightActions: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    flex: 1,
     backgroundColor: "#4caf50",
-    borderRadius:18,
-    marginBottom:18,
-    marginTop:2,
-    paddingRight: 16
-  }
+    borderRadius: 18,
+    marginBottom: 18,
+    marginTop: 2,
+    paddingRight: 16,
+  },
+  
 });

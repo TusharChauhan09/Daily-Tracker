@@ -36,6 +36,7 @@ export default function AddTasksScreen() {
           "user_id": user.$id,
           "title" : title,
           "description" : description,
+           "frequency": frequency,
           "streak_count" : 0,
           "last_completed": new Date().toISOString(),
           "created_at": new Date().toISOString()
@@ -44,6 +45,7 @@ export default function AddTasksScreen() {
       setTitle("");
       setDescription("");
       setFrequency("daily");
+      setError("");
       router.back();
     }
     catch(error){
@@ -56,7 +58,6 @@ export default function AddTasksScreen() {
       }
       setError("There was an error creating the add-task ");
     }
-    
   };
 
   return (

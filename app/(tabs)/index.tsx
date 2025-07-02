@@ -21,7 +21,7 @@ import {
 } from "@/lib/appwrite";
 import { ID, Query } from "react-native-appwrite";
 
-import { HabitCompletion, TasksType } from "@/types/database.type";
+import { TaskCompletion , TasksType } from "@/types/database.type";
 
 import { useRouter } from "expo-router";
 
@@ -136,7 +136,7 @@ export default function Index() {
         ]
       );
       // console.log(response.documents);
-      const completions = response.documents as HabitCompletion[];
+      const completions = response.documents as TaskCompletion[];
       setCompletedTasks(completions.map((c) => c.tasks_id as string));
       // console.log(completedTasks?.toString());
     } catch (error) {
@@ -231,8 +231,8 @@ export default function Index() {
       <ScrollView showsHorizontalScrollIndicator={false}>
         {tasks?.length === 0 ? (
           <View style={styles.emptyState}>
-            {" "}
             <Text style={styles.emptyStateText}>
+              
               No Tasks Present. Add Your Tasks
             </Text>
             <Button

@@ -10,7 +10,7 @@ export interface TasksType extends Models.Document {
     created_at: string;
 }
 
-export interface HabitCompletion extends Models.Document{
+export interface TaskCompletion extends Models.Document{
     tasks_id: string,
     user_id: string,
     completed_at: string 

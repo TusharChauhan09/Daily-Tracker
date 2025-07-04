@@ -1,50 +1,71 @@
-# Welcome to your Expo app 👋
+<h1 align="center">📱 Daily Tracker</h1>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  A cross-platform mobile app built with <strong>Expo</strong> and <strong>React Native</strong> to help you track daily tasks, activities, or habits effortlessly.
+</p>
 
-## Get started
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-ios%20%7C%20android-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/framework-react--native-lightblue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/expo-%5ESDK%2050%2B-brightgreen?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" />
+</p>
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 🚀 Overview
 
-2. Start the app
+**Daily Tracker** is a mobile app designed to help users:
+- Log daily tasks or activities with time or status
+- Organize tasks using custom categories
+- Track progress visually with graphs/charts
+- Use offline functionality via `AsyncStorage`
 
-   ```bash
-   npx expo start
-   ```
+Whether you're tracking work, fitness, study, or personal habits, this app makes it simple, visual, and accessible on both **iOS** and **Android**.
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## ✨ Features
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- ✅ **Task Logging** – Log daily tasks with duration or completion status  
+- 🗂️ **Custom Categories** – Group tasks (e.g. Fitness, Study, Work)  
+- 📈 **Progress Visualization** – Charts to monitor productivity trends  
+- 📝 **Editable Entries** – Add, edit, and delete tasks and categories  
+- 📡 **Offline Support** – Full functionality even without internet  
+- 🔔 **Push Notifications** *(optional)* – Reminders to log tasks  
+- 📂 **File-based Routing** using `Expo Router`  
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 🛠️ Tech Stack
 
+| Tool           | Description                          |
+|----------------|--------------------------------------|
+| **Expo**       | Fast and easy React Native dev tool  |
+| **React Native** | Cross-platform mobile UI framework |
+| **JavaScript/TypeScript** | App logic and UI |
+| **AsyncStorage** | Offline local storage               |
+| **Expo Router** | Simplified navigation & routing     |
+
+---
+
+## 📦 Getting Started
+
+### 🔧 Prerequisites
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v16+ recommended)
+- npm or Yarn
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- [Expo Go](https://expo.dev/client) on your mobile device *(for testing)*
+- Android Studio *(for emulator testing)*
+- Xcode *(for iOS simulator - macOS only)*
+
+---
+
+## 🧪 Setup & Running
+
+### 1️⃣ Install dependencies
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+npm install
